@@ -1190,11 +1190,12 @@ static PyObject* PyObjHandle_Damage(PyObject* obj, PyObject* args) {
 	Dice dice;
 	int attackPower = 0;
 	D20ActionType actionType = D20A_NONE;
-	if (!PyArg_ParseTuple(args, "O&iO&|ii:objhndl.damage", &ConvertObjHndl, &attacker, &damageType, &ConvertDice, &dice, &attackPower, &actionType)) {
+	int damageMesLine = 103; // line 103 of damage.mes says: "Unknown"
+	if (!PyArg_ParseTuple(args, "O&iO&|iii:objhndl.damage", &ConvertObjHndl, &attacker, &damageType, &ConvertDice, &dice, &attackPower, &actionType, &damageMesLine)) {
 		return 0;
 	}
-
-	damage.DealDamageFullUnk(self->handle, attacker, dice, damageType, attackPower, actionType);
+	
+	damage.DealDamageFullUnk(self->handle, attacker, dice, damageType, attackPower, actionType, damageMesLine);
 	Py_RETURN_NONE;
 }
 

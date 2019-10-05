@@ -84,10 +84,10 @@ public:
 		const Dice &dice, 
 		DamageType type = DamageType::Unspecified, 
 		int attackPower = 0, 
-		D20ActionType actionType = D20A_NONE) {
+		D20ActionType actionType = D20A_NONE,
+		int damageMesLine = 103) {
 		// 100% of damage is dealt (no saving throw)
-		// line 103 of damage.mes says: "Unknown"
-		DealDamage(victim, attacker, dice, type, attackPower, 100, 103, actionType);
+		DealDamage(victim, attacker, dice, type, attackPower, 100, damageMesLine, actionType);
 	}
 
 	void DealSpellDamageFullUnk(objHndl victim, objHndl attacker, const Dice &dice, DamageType type, int attackPower, D20ActionType actionType, int spellId, int flags) {

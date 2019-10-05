@@ -32,7 +32,7 @@ struct TemplePlusConfig
 	bool showDialogLineNos = false; // Previously: -dialognumber
 	uint32_t scrollDistance = 10; // Not really sure what this is used for. Previously: -scrolldist
 	std::string defaultModule = "ToEE"; // Previousl: -mod: 
-	bool skipIntro = true;
+	bool skipIntro = false;
 	bool skipLegal = true;
 	bool engineEnhancements = true;
 	bool pathfindingDebugMode = false;
@@ -98,7 +98,7 @@ struct TemplePlusConfig
 	std::string fogOfWar = "Normal";
 	bool disableFogOfWar = false; // Previously: -nofog
 	double speedupFactor = 1.0;
-	bool equalizeMoveSpeed = true;
+	bool equalizeMoveSpeed = false;
 	bool fastSneakAnim = false;
 	bool alertAiThroughDoors = false;
 	int walkDistanceFt = 0;
