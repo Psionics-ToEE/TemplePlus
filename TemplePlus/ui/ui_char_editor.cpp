@@ -2712,7 +2712,8 @@ bool UiCharEditor::FeatCanPick(feat_enums feat) {
 		}
 
 	default:
-		return true;
+		// Inspected feat is a multi-master feat but none of the handled cases (vanilla feats), so this is a custom (new) multi-master feat. Therefore perform the same prerequisite check normally done to allow standard or custom prereq definitions.
+		return feats.FeatPrereqsCheck(handle, feat, featsPicked.size() > 0 ? &featsPicked[0] : nullptr, featsPicked.size(), selPkt.classCode, selPkt.statBeingRaised) != FALSE;
 	}
 
 

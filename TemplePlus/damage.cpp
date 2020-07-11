@@ -168,6 +168,20 @@ int DamagePacket::AddDR(int amount, DamageType damType, int damageMesLine){
 	return  FALSE;
 }
 
+int DamagePacket::AddBypassDR(int amount, DamageType damType, D20AttackPower bypassAttackPower, int damageMesLine)
+{
+	if (this->damResCount < 5u) {
+		this->damageResistances[this->damResCount].damageReductionAmount = amount;
+		this->damageResistances[this->damResCount].dmgFactor = 0.0f;
+		this->damageResistances[this->damResCount].type = damType;
+		this->damageResistances[this->damResCount].attackPowerType = bypassAttackPower;
+		this->damageResistances[this->damResCount].typeDescription = damage.GetMesline(damageMesLine);
+		this->damageResistances[this->damResCount++].causedBy = nullptr;
+		return TRUE;
+	}
+	return  FALSE;
+}
+
 void DamagePacket::AddAttackPower(int attackPower)
 {
 	this->attackPowerType |= attackPower;
