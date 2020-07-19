@@ -267,11 +267,7 @@ BOOL BonusList::SetOverallCap(int newBonFlags, int newCap, int newCapType, int n
 
 objHndl AttackPacket::GetWeaponUsed() const
 {
-	if ( !(flags& D20CAF_TOUCH_ATTACK) ||  (flags & D20CAF_THROWN_GRENADE) )
-	{
-		return weaponUsed;
-	}
-	return objHndl::null;
+	return weaponUsed;
 }
 
 bool AttackPacket::IsOffhandAttack()

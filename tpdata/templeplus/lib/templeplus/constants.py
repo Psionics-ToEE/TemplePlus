@@ -3802,6 +3802,9 @@ EK_Q_Get_Arcane_Spell_Failure = 0x149 # gets arcane spell failure for (class_enu
 EK_Q_Is_Preferring_One_Handed_Wield = 0x14A # gets arcane spell failure for (class_enum, equip_slot) combo
 EK_Q_Scribe_Scroll_Spell_Level = 0x14B
 EK_Q_Critter_Is_Immune_Paralysis = 0x14C
+EK_Q_Convert_Attack_Roll_To_Armed_Touch_Attack_Roll = 0x180 # called after OnToHitBonus2, hit processing for an attack will be considered a touch attack for roll purposes, allowing touch attack outside of spell use
+EK_Q_Override_Natural_Roll_One_Or_Twenty = 0x181 # e.g. a roll of 1 will not count as a miss and a roll of 20 will not count as a hit, the comparison against target AC is forced
+
 
 EK_LVL_Stats_Activate = 100
 EK_LVL_Stats_Check_Complete = 101

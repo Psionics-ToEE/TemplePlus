@@ -1741,7 +1741,9 @@ enum D20DispatcherKey : uint32_t {
 	DK_QUE_Is_Preferring_One_Handed_Wield = 0x14A, // e.g. a character with a Buckler can opt to wield a sword one handed so as to not take the -1 to hit penalty
 	DK_QUE_Scribe_Scroll_Spell_Level = 0x14B,
 	DK_QUE_Critter_Is_Immune_Paralysis = 0x14C,
-
+	DK_QUE_Convert_Attack_Roll_To_Armed_Touch_Attack_Roll = 0x180, // called after OnToHitBonus2, hit processing for an attack will be considered a touch attack for roll purposes, allowing touch attack outside of spell use
+	DK_QUE_Override_Natural_Roll_One_Or_Twenty = 0x181, // e.g. a roll of 1 will not count as a miss and a roll of 20 will not count as a hit, the comparison to target AC is forced
+	
 	DK_LVL_Stats_Activate = 100,
 	DK_LVL_Stats_Check_Complete = 101,
 	DK_LVL_Stats_Finalize = 102,

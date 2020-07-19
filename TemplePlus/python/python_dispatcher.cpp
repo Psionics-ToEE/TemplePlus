@@ -465,6 +465,8 @@ PYBIND11_EMBEDDED_MODULE(tpdp, m) {
 		.value("UseItem", D20ActionType::D20A_USE_ITEM)
 		.value("UsePotion", D20ActionType::D20A_USE_POTION)
 		.value("Feint", D20ActionType::D20A_FEINT)
+		.value("Touch Attack", D20ActionType::D20A_TOUCH_ATTACK)
+		.value("Throw", D20ActionType::D20A_THROW)
 		.export_values()
 		;
 

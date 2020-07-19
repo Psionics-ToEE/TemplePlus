@@ -1260,12 +1260,7 @@ std::vector<objHndl> LegacyCombatSystem::GetEnemiesCanMelee(objHndl handle){
 
 objHndl LegacyCombatSystem::GetWeapon(AttackPacket* attackPacket)
 {
-	D20CAF flags = attackPacket->flags;
-	objHndl result = objHndl::null;
-
-	if (!(flags & D20CAF_TOUCH_ATTACK) || flags & D20CAF_THROWN_GRENADE )
-		result = attackPacket->weaponUsed;
-	return result;
+	return attackPacket->weaponUsed;
 }
 
 bool LegacyCombatSystem::IsUnarmed(objHndl handle){
@@ -1590,8 +1585,6 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 		}
 	}
 
-
-
 	// miss chances handling
 	static auto getDefenderConcealmentMissChance = [](objHndl attacker, objHndl victim, D20Actn & d20a) {
 
@@ -1647,7 +1640,6 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 		else { // failure
 			d20a.rollHistId1 = histSys.RollHistoryType5Add(performer, tgt, defenderMissChance, 60, missChanceRoll, 195, 193);
 
-
 			// Blind Fight handling (second chance)
 			if (!feats.HasFeatCountByClass(performer, FEAT_BLIND_FIGHT))
 				return;
@@ -1678,7 +1670,6 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 	}
 	dispIoToHitBon.Dispatch(performer, objHndl::null, dispTypeBucklerAcPenalty, DK_NONE); // adds buckler penalty to the bonus list
 	
-	
 	if (dispIoToHitBon.attackPacket.weaponUsed
 		&& gameSystems->GetObj().GetObject(dispIoToHitBon.attackPacket.weaponUsed)->type != obj_t_weapon){
 		dispIoToHitBon.attackPacket.weaponUsed = 0i64;
@@ -1686,6 +1677,13 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 	dispIoToHitBon.attackPacket.ammoItem = CheckRangedWeaponAmmo(performer);
 	dispIoToHitBon.attackPacket.flags = (D20CAF) (dispIoToHitBon.attackPacket.flags | D20CAF_FINAL_ATTACK_ROLL);
 	dispIoToHitBon.Dispatch(performer, objHndl::null, dispTypeToHitBonus2, DK_NONE); // note: the "Global" condition has ToHitBonus2 hook that dispatches the ToHitBonusBase
+	
+	// Query to convert this attack roll to an armed touch attack roll (doesn't really change anything if you are using objHndl.perform_touch_attack which is for spells)
+	bool armedTouchAttack = (bool)d20Sys.d20Query(performer, DK_QUE_Convert_Attack_Roll_To_Armed_Touch_Attack_Roll);
+	if (armedTouchAttack) {
+		dispIoToHitBon.attackPacket.flags = (D20CAF)(dispIoToHitBon.attackPacket.flags | D20CAF_TOUCH_ATTACK);
+	}
+
 	auto toHitBonFinal = dispIoToHitBon.Dispatch(tgt, objHndl::null, dispTypeToHitBonusFromDefenderCondition, DK_NONE);
 
 	dispIoTgtAc.attackPacket = dispIoToHitBon.attackPacket;
@@ -1732,7 +1730,20 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 	auto isMiss = [critAlwaysCheat](int roll, int toHitBon, int tgtAc) {
 		if (critAlwaysCheat)
 			return false;
-		return roll == 1 || roll != 20 && roll + toHitBon < tgtAc;
+		bool missedHit;
+		// Natural 1: Always miss
+		if (roll == 1) {
+			missedHit = true;
+		}
+		// Natural 20: Always hit
+		else if (roll == 20) {
+			missedHit = false;
+		}
+		// Otherwise: Calculate if miss or hit
+		else {
+			missedHit = ((roll + toHitBon) < tgtAc);
+		}
+		return missedHit;
 	};
 	#define IS_MISS isMiss(toHitRoll, toHitBonFinal, tgtAcFinal)
 
@@ -1786,10 +1797,7 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 		// do Deflect Arrow dispatch
 		dispIoToHitBon.Dispatch(dispIoToHitBon.attackPacket.victim, objHndl::null, dispTypeDeflectArrows, DK_NONE);
 	}
-
-
 	
-
 	// sphagetti handling for Sanctuary spell
 	if (d20a.d20ATarget && gameSystems->GetObj().GetObject(d20a.d20ATarget)->IsCritter()
 		&& !d20Sys.D20QueryWithDataDefaultTrue(d20a.d20ATarget, DK_QUE_CanBeAffected_PerformAction, &d20a,0)){
@@ -1807,6 +1815,13 @@ void LegacyCombatSystem::ToHitProcessing(D20Actn& d20a){
 	d20a.d20Caf = dispIoToHitBon.attackPacket.flags;
 	d20a.rollHistId0 = histSys.RollHistoryType0Add(toHitRoll, critHitRoll, performer, tgt, &dispIoToHitBon.bonlist, &dispIoTgtAc.bonlist, dispIoToHitBon.attackPacket.flags);
 	
+	// clean up armed touch attack roll flag so it doesn't cause weird behavior during weapon damage processing
+	// If the D20 action itself is already a touch attack, don't do anything to keep vanilla behavior
+	if (armedTouchAttack && 
+		(d20a.d20Caf & D20CAF_TOUCH_ATTACK) &&
+		(d20a.d20ActType != D20ActionType::D20A_TOUCH_ATTACK)) {
+		d20a.d20Caf ^= D20CAF_TOUCH_ATTACK;
+	}
 	// there were some additional debug stubs here (nullsubs)
 }
 

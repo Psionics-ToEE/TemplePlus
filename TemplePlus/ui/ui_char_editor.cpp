@@ -470,6 +470,26 @@ PYBIND11_EMBEDDED_MODULE(char_editor, mm) {
 		
 		return statLvl;
 	}, py::arg("stat"), py::arg("stat_arg") = -1)
+	.def("stat_base_get", [](int statEnum)->int {
+		auto stat = (Stat)statEnum;
+		auto handle = chargen.GetEditedChar();
+		auto &charPkt = chargen.GetCharEditorSelPacket();
+
+		auto statLvl = objects.StatLevelGetBase(handle, stat);
+		
+		// Increase character level if appropriate
+		if (!chargen.IsNewChar()) {
+			if (charPkt.classCode == stat) {
+				statLvl++;
+			}
+			// Report 1 higher if the stat is being raised
+			if (stat == charPkt.statBeingRaised) {
+				statLvl++;
+			}
+		}
+		
+		return statLvl;
+	})
 	.def("skill_level_get", [](int skillEnum)->int {
 		auto skill = (SkillEnum)skillEnum;
 		auto handle = chargen.GetEditedChar();
