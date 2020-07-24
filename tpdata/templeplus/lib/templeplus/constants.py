@@ -3802,6 +3802,7 @@ EK_Q_Get_Arcane_Spell_Failure = 0x149 # gets arcane spell failure for (class_enu
 EK_Q_Is_Preferring_One_Handed_Wield = 0x14A # gets arcane spell failure for (class_enum, equip_slot) combo
 EK_Q_Scribe_Scroll_Spell_Level = 0x14B
 EK_Q_Critter_Is_Immune_Paralysis = 0x14C
+# new queries (relative to vanilla)
 EK_Q_Convert_Attack_Roll_To_Armed_Touch_Attack_Roll = 0x180 # called after OnToHitBonus2, hit processing for an attack will be considered a touch attack for roll purposes, allowing touch attack outside of spell use
 EK_Q_Override_Natural_Roll_One_Or_Twenty = 0x181 # e.g. a roll of 1 will not count as a miss and a roll of 20 will not count as a hit, the comparison against target AC is forced
 
@@ -3929,8 +3930,19 @@ PQF_A_STAR_TIME_CAPPED = 0x80000
 PQF_IGNORE_CRITTERS_ON_DESTINATION = 0x800000
 PQF_AVOID_AOOS = 0x1000000 # NEW! Make the PF attempt avoid Aoos (using the ShouldIgnore function in combat.py to ignore insiginificant threats)
 
-
-TBSF_FreeActionSpellPerformed = 512
+TBSF_NONE = 0
+TBSF_1 = 1
+TBSF_Movement = 2
+TBSF_Movement2 = 4
+TBSF_TouchAttack = 8 # denotes that you're doing a touch attack
+TBSF_CritterSpell = 0x10 # denotes that the spell being cast is actually a critter's natural ability, so don't provoke AoO
+TBSF_HasActedThisRound = 0x20 # prevents you from dragging the portrait in the initiative row
+TBSF_FullAttack = 0x40
+TBSF_80 = 0x80,
+TBSF_100 = 0x100
+TBSF_FreeActionSpellPerformed = 0x200 #already performed free-action spell this round (e.g. from Quickened metamagic feat), cannot do another
+TBSF_400 = 0x400
+TBSF_ChangedWornItem = 0x800 #denotes that you've changed items in the inventory during combat (to prevent double-charging you); unflags this when hiding the inventory
 
 MODE_TARGET_NONE = 0
 MODE_TARGET_SINGLE = 1

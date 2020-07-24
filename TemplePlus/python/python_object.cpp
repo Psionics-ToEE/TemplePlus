@@ -458,6 +458,17 @@ static PyObject* PyObjHandle_CanSneakAttack(PyObject* obj, PyObject* args) {
 	return PyInt_FromLong(result);
 }
 
+static PyObject* PyObjHandle_CombatAdvanceTurn(PyObject* obj, PyObject* args)
+{
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		return 0;
+	}
+
+	combatSys.CombatAdvanceTurn(self->handle);
+
+	Py_RETURN_NONE;
+}
 
 static PyObject* PyObjHandle_CastSpell(PyObject* obj, PyObject* args) {
 	auto self = GetSelf(obj);
@@ -3369,6 +3380,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{"can_see", PyObjHandle_HasLos, METH_VARARGS, NULL },
 	{"can_sense", PyObjHandle_CanSense, METH_VARARGS, NULL },
 	{ "can_sneak_attack", PyObjHandle_CanSneakAttack, METH_VARARGS, NULL },
+	{"combat_advance_turn", PyObjHandle_CombatAdvanceTurn, METH_VARARGS, NULL },
 	{ "concealed_set", PyObjHandle_ConcealedSet, METH_VARARGS, NULL },
 	{ "condition_add_with_args", PyObjHandle_ConditionAddWithArgs, METH_VARARGS, NULL },
 	{ "condition_add", PyObjHandle_ConditionAddWithArgs, METH_VARARGS, NULL },
