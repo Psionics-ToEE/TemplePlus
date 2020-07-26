@@ -729,6 +729,10 @@ PYBIND11_EMBEDDED_MODULE(tpdp, m) {
 		.def_readwrite("return_val", &DispIoD20Signal::return_val)
 		.def_readwrite("data1", &DispIoD20Signal::data1)
 		.def_readwrite("data2", &DispIoD20Signal::data2)
+		.def("get_d20_action", [](DispIoD20Signal& evtObj)->D20Actn& {
+			D20Actn* d20a = (D20Actn*)evtObj.data1;
+			return *d20a;
+		}, "Used for S_Broadcast_Action callbacks to get a D20Action from the data1 field")
 		;
 
 	py::class_<DispIoD20Query, DispIO>(m, "EventObjD20Query")

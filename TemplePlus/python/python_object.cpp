@@ -638,6 +638,28 @@ static PyObject* PyObjHandle_CanFindPathToObj(PyObject* obj, PyObject* args) {
 	return PyInt_FromLong(static_cast<long>(pathLen));
 }
 
+static PyObject* PyObjHandle_CanMeleeTarget(PyObject* obj, PyObject* args) {
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		logger->warn("Python can_melee_target called with null object");
+		return PyInt_FromLong(0);
+	}
+
+	objHndl target;
+	if (!PyArg_ParseTuple(args, "O&:objhndl.can_melee_target", &ConvertObjHndl, &target)) {
+		return PyInt_FromLong(0);
+	}
+
+	if (!target) {
+		logger->warn("Python can_melee_target called with null target");
+		return PyInt_FromLong(0);
+	}
+
+	if(combatSys.CanMeleeTarget(self->handle, target))
+		return PyInt_FromLong(1);
+
+	return PyInt_FromLong(0);
+}
 
 static PyObject* PyObjHandle_SkillLevelGet(PyObject* obj, PyObject* args) {
 	auto self = GetSelf(obj);
@@ -3260,6 +3282,28 @@ static PyObject* PyObjHandle_Dominate(PyObject* obj, PyObject* args) {
 	return PyInt_FromLong(result);
 }
 
+static PyObject* PyObjHandle_DoAttackOfOpportunity(PyObject* obj, PyObject* args) {
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		logger->warn("Python do_aoo called with null object");
+		Py_RETURN_NONE;
+	}
+
+	objHndl target;
+	if (!PyArg_ParseTuple(args, "O&:objhndl.do_aoo", &ConvertObjHndl, &target)) {
+		return 0;
+	}
+
+	if (!target) {
+		logger->warn("Python do_aoo called with null target");
+		Py_RETURN_NONE;
+	}
+
+	actSeqSys.DoAoo(self->handle, target);
+
+	Py_RETURN_NONE;
+}
+
 static PyObject* PyObjHandle_IsUnconscious(PyObject* obj, PyObject* args) {
 	auto self = GetSelf(obj);
 	if (!self->handle) {
@@ -3377,6 +3421,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{"cast_spell", PyObjHandle_CastSpell, METH_VARARGS, NULL },
 	{"can_cast_spell", PyObjHandle_CanCastSpell, METH_VARARGS, NULL },
 	{"can_find_path_to_obj", PyObjHandle_CanFindPathToObj, METH_VARARGS, NULL },
+	{"can_melee_target", PyObjHandle_CanMeleeTarget, METH_VARARGS, NULL },
 	{"can_see", PyObjHandle_HasLos, METH_VARARGS, NULL },
 	{"can_sense", PyObjHandle_CanSense, METH_VARARGS, NULL },
 	{ "can_sneak_attack", PyObjHandle_CanSneakAttack, METH_VARARGS, NULL },
@@ -3398,7 +3443,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{ "d20_query", PyObjHandle_D20Query, METH_VARARGS, NULL },
 	{ "d20_query_has_spell_condition", PyObjHandle_D20QueryHasSpellCond, METH_VARARGS, NULL },
 	{ "d20_query_with_data", PyObjHandle_D20QueryWithData, METH_VARARGS, NULL },
-    { "d20_query_with_object", PyObjHandle_D20QueryWithObject, METH_VARARGS, NULL },
+	{ "d20_query_with_object", PyObjHandle_D20QueryWithObject, METH_VARARGS, NULL },
 	{ "d20_query_test_data", PyObjHandle_D20QueryTestData, METH_VARARGS, NULL },
 	{ "d20_query_get_data", PyObjHandle_D20QueryGetData, METH_VARARGS, NULL },
 	{ "d20_send_signal", PyObjHandle_D20SendSignal, METH_VARARGS, NULL },
@@ -3411,6 +3456,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{ "distance_to", PyObjHandle_DistanceTo, METH_VARARGS, NULL },
 	{ "divine_spell_level_can_cast", PyObjHandle_DivineSpellLevelCanCast, METH_VARARGS, NULL },
 	{ "dominate", PyObjHandle_Dominate, METH_VARARGS, NULL },
+	{ "do_aoo", PyObjHandle_DoAttackOfOpportunity, METH_VARARGS, NULL },
 
 	{ "faction_has", PyObjHandle_FactionHas, METH_VARARGS, "Check if NPC has faction. Doesn't work on PCs!" },
 	{ "faction_add", PyObjHandle_FactionAdd, METH_VARARGS, "Adds faction to NPC. Doesn't work on PCs!" },
