@@ -359,6 +359,7 @@ D20STD_F_SPELL_DESCRIPTOR_AIR = 31
 D20STD_F_SPELL_DESCRIPTOR_EARTH = 32
 D20STD_F_SPELL_DESCRIPTOR_WATER = 33
 D20STD_F_DISABLE_SLIPPERY_MIND = 34
+D20STD_F_FINAL_ROLL = 35
 
 D20_MODS_SPELLS_F_PRAYER_NEGATIVE = -4
 D20_MODS_SPELLS_F_PRAYER_POSITIVE = -3
@@ -3256,6 +3257,7 @@ stat_level_abjurant_champion = 45
 stat_level_scout = 46
 stat_level_warmage = 47
 stat_level_beguiler = 48
+stat_level_swashbuckler = 49
 
 stat_level_psion = 58
 stat_level_psychic_warrior = 59
