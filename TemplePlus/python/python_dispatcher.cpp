@@ -223,6 +223,9 @@ PYBIND11_EMBEDDED_MODULE(tpdp, m) {
 		.def("add_spell_touch_attack_discharge_radial_menu_hook", [](CondStructNew &condStr) {
 			condStr.AddHook(dispTypeRadialMenuEntry, DK_NONE, temple::GetRef<int(__cdecl)(DispatcherCallbackArgs)>(0x100C3450));
 		})
+		.def("add_spell_dispel_check_standard", [](CondStructNew& condStr) {
+			condStr.AddHook(dispTypeDispelCheck, DK_NONE, DispelCheck);
+		})
 		;
 
 	py::class_<DispIO>(m, "EventObj", "The base Event Object")
@@ -827,6 +830,7 @@ PYBIND11_EMBEDDED_MODULE(tpdp, m) {
 	py::class_<DispIoD20ActionTurnBased, DispIO>(m, "EventObjD20Action", "Used for D20 Action Checks/Performance events and obtaining number of attacks (base/bonus/natural)")
 		.def_readwrite("return_val", &DispIoD20ActionTurnBased::returnVal)
 		.def_readwrite("d20a", &DispIoD20ActionTurnBased::d20a)
+		.def_readwrite("bonus_list", &DispIoD20ActionTurnBased::bonlist)
 		.def_readwrite("turnbased_status", &DispIoD20ActionTurnBased::tbStatus);
 
 	py::class_<DispIoMoveSpeed, DispIO>(m, "EventObjMoveSpeed", "Used for getting move speed, and also for model size scaling with Temple+.")

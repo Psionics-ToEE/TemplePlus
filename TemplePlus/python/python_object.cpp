@@ -2373,7 +2373,11 @@ static PyObject* PyObjHandle_AnimGoalInterrupt(PyObject* obj, PyObject* args) {
 	if (!self->handle) {
 		return PyInt_FromLong(0);
 	}
-	gameSystems->GetAnim().Interrupt(self->handle, AGP_HIGHEST, false);
+	AnimGoalPriority priority = AGP_HIGHEST;
+	if (!PyArg_ParseTuple(args, "|i:objhndl.anim_goal_interrupt", &priority)) {
+		return 0;
+	}
+	gameSystems->GetAnim().Interrupt(self->handle, priority, false);
 	Py_RETURN_NONE;
 }
 
@@ -2389,6 +2393,37 @@ static PyObject* PyObjHandle_AnimGoalPushAttack(PyObject* obj, PyObject* args) {
 		return 0;
 	}
 	return PyInt_FromLong(gameSystems->GetAnim().PushAttackAnim(self->handle, tgt, -1, animIdx, isCrit, isSecondary));
+}
+
+static PyObject* PyObjHandle_AnimGoalPushUseObject(PyObject* obj, PyObject* args) {
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		return PyInt_FromLong(0);
+	}
+
+	objHndl tgt = objHndl::null;
+	AnimGoalType goalType = ag_use_object;
+	locXY tgtLoc = LocAndOffsets::null.location;
+	int someFlag = 1;
+	if (!PyArg_ParseTuple(args, "O&|iLi:objhndl.anim_goal_use_object", &ConvertObjHndl, &tgt, &goalType, &tgtLoc, &someFlag)) {
+		return 0;
+	}
+	gameSystems->GetAnim().PushForMouseTarget(self->handle, ag_use_object, tgt, tgtLoc, objHndl::null, someFlag);
+	return PyInt_FromLong(1);
+}
+
+static PyObject* PyObjHandle_ContainerOpenUI(PyObject* obj, PyObject* args) {
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		return PyInt_FromLong(0);
+	}
+
+	objHndl tgt = objHndl::null;
+	if (!PyArg_ParseTuple(args, "O&:objhndl.container_open_ui", &ConvertObjHndl, &tgt)) {
+		return 0;
+	}
+	inventory.UiOpenContainer(self->handle, tgt);
+	return PyInt_FromLong(1);
 }
 
 static PyObject* PyObjHandle_AnimGoalGetNewId(PyObject* obj, PyObject* args) {
@@ -3359,6 +3394,21 @@ static PyObject* PyObjHandle_Unconceal(PyObject* obj, PyObject* args) {
 	return PyInt_FromLong(result);
 }
 
+static PyObject* PyObjHandle_UseItem(PyObject* obj, PyObject* args) {
+	auto self = GetSelf(obj);
+	if (!self->handle) {
+		return PyInt_FromLong(0);
+	}
+	objHndl item = objHndl::null;
+	objHndl target = objHndl::null;
+	if (!PyArg_ParseTuple(args, "O&|O&:objhndl.use_item", &ConvertObjHndl, &item, &ConvertObjHndl, &target)) {
+		return 0;
+	}
+	if (!target) target = self->handle;
+	uint32_t result = combatSys.UseItem(self->handle, item, target);
+	return PyInt_FromLong(result);
+}
+
 static PyObject* PyObjHandle_PendingToMemorized(PyObject* obj, PyObject* args) {
 	auto self = GetSelf(obj);
 	if (!self->handle) {
@@ -3551,6 +3601,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{ "anim_callback", PyObjHandle_AnimCallback, METH_VARARGS, NULL },
 	{ "anim_goal_interrupt", PyObjHandle_AnimGoalInterrupt, METH_VARARGS, NULL },
 	{ "anim_goal_push_attack", PyObjHandle_AnimGoalPushAttack, METH_VARARGS, NULL },
+	{ "anim_goal_use_object", PyObjHandle_AnimGoalPushUseObject, METH_VARARGS, NULL },
 	{ "anim_goal_get_new_id", PyObjHandle_AnimGoalGetNewId, METH_VARARGS, NULL },
 	{ "apply_projectile_particles", PyObjHandle_ApplyProjectileParticles, METH_VARARGS, NULL },
 	{ "apply_projectile_hit_particles", PyObjHandle_ApplyProjectileHitParticles, METH_VARARGS, NULL },
@@ -3580,6 +3631,8 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{ "container_flag_set", SetFlag<obj_f_container_flags>, METH_VARARGS, NULL },
 	{ "container_flag_unset", ClearFlag<obj_f_container_flags>, METH_VARARGS, NULL },
 	{ "container_toggle_open", PyObjHandle_ContainerToggleOpen, METH_VARARGS, NULL },
+	{ "container_open_ui", PyObjHandle_ContainerOpenUI, METH_VARARGS, NULL },
+	
 	{ "critter_flags_get", GetFlags<obj_f_critter_flags>, METH_VARARGS, NULL },
 	{ "critter_flag_set", SetFlag<obj_f_critter_flags>, METH_VARARGS, NULL },
 	{ "critter_flag_unset", ClearFlag<obj_f_critter_flags>, METH_VARARGS, NULL },
@@ -3756,6 +3809,7 @@ static PyMethodDef PyObjHandleMethods[] = {
 	{"trip_check", PyObjHandle_TripCheck, METH_VARARGS, NULL },
 
 	{ "unconceal", PyObjHandle_Unconceal, METH_VARARGS, NULL },
+	{ "use_item", PyObjHandle_UseItem, METH_VARARGS, NULL },
 
 	{NULL, NULL, NULL, NULL}
 };
