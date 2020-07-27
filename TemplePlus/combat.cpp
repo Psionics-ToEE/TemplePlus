@@ -1886,6 +1886,11 @@ bool LegacyCombatSystem::TripCheck(objHndl handle, objHndl target){
 
 	return succeeded;
 }
+
+int LegacyCombatSystem::GetCombatRoundCount()
+{
+	return *combatAddresses.combatRoundCount;
+}
 #pragma endregion
 
 
